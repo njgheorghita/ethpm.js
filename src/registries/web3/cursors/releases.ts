@@ -84,7 +84,7 @@ export default class ReleasesCursor extends Paged<BN> implements IterableIterato
             name: "offset"
           }, {
             type: "uint",
-            limit: "limit"
+            name: "limit"
           }]
         }, ["0x" + offset.toString("hex"), "0x" + limit.toString("hex")]);
 

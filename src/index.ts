@@ -3,7 +3,7 @@
  */
 
 require("source-map-support/register");
-require("module-alias/register");
+require("better-module-alias")(__dirname);
 
 const { EthPM } = require("./ethpm");
 

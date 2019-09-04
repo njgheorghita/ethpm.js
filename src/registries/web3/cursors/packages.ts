@@ -47,7 +47,7 @@ export default class PackagesCursor extends Paged<BN> implements IterableIterato
           to: this.to,
           data
         }).then((result) => {
-          resolve(this.web3.eth.abi.decodeParameter("string", result));
+          resolve(this.web3.eth.abi.decodeParameter("string", result).toString());
         });
       }
     });
@@ -79,7 +79,7 @@ export default class PackagesCursor extends Paged<BN> implements IterableIterato
             name: "offset"
           }, {
             type: "uint",
-            limit: "limit"
+            name: "limit"
           }]
         }, ["0x" + offset.toString("hex"), "0x" + limit.toString("hex")]);
 

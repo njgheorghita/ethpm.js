@@ -5,7 +5,7 @@
 import { URL } from "url";
 import * as t from "io-ts";
 import { ThrowReporter } from "io-ts/lib/ThrowReporter";
-import { Provider as Web3Provider } from "web3/providers";
+import { Web3EthereumProvider } from "web3-providers";
 import Web3 from "web3";
 
 import { Maybe } from "ethpm/types";
@@ -24,7 +24,7 @@ export class Web3RegistryService implements registries.Service {
   private address: string;
   private accounts: string[];
 
-  constructor (provider: Web3Provider, address: string) {
+  constructor (provider: Web3EthereumProvider, address: string) {
     this.web3 = new Web3(provider);
     this.address = address;
     this.accounts = [];
@@ -87,7 +87,7 @@ export class Web3RegistryService implements registries.Service {
       data: numPackagesTx
     });
     numPackages = new BN(
-      this.web3.eth.abi.decodeParameter("uint", numPackages)
+      this.web3.eth.abi.decodeParameter("uint", numPackages).toString()
     );
 
     // now paginate
@@ -171,7 +171,7 @@ export class Web3RegistryService implements registries.Service {
             type: "bytes32",
             name: "releaseId"
           }]
-        }, ["0x" + releaseId.toString("hex")]);
+        }, ["0x" + releaseId.toString()]);
 
         result = await this.web3.eth.call({
           from: this.accounts[0],
@@ -190,7 +190,7 @@ export class Web3RegistryService implements registries.Service {
 }
 
 type Web3RegistryOptions = {
-  provider: Web3Provider;
+  provider: Web3EthereumProvider;
   registryAddress: string;
 };
 
