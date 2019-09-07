@@ -2,10 +2,10 @@
  * @module "ethpm/session"
  */
 
-import * as config from "ethpm/config";
-import * as pkg from "ethpm/package";
-import * as manifests from "ethpm/manifests";
-import * as storage from "ethpm/storage";
+import * as config from "../config";
+import * as pkg from "../package";
+import * as manifests from "../manifests";
+import * as storage from "../storage";
 
 
 export class Query<T extends config.Config> {

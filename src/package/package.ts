@@ -4,7 +4,7 @@
 
 import { URL } from "url";
 
-import { Maybe } from "ethpm/types";
+import { Maybe } from "../types";
 import { Meta } from "./meta";
 import { Link } from "./link";
 

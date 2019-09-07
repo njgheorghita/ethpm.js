@@ -1,8 +1,8 @@
-import { v2 } from "ethpm/manifests/v2";
+import { v2 } from "../../../manifests/v2";
 
-import hash from "ethpm/storage/ipfs/hash";
+import hash from "../../../storage/ipfs/hash";
 
-import examples from "test/examples/manifests";
+import examples from "../../../../test/examples/manifests";
 
 it("hashes manifests", async () => {
   const standardToken = examples["standard-token"];

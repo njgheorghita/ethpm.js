@@ -5,13 +5,13 @@
 import { URL } from "url";
 import * as t from "io-ts";
 import { ThrowReporter } from "io-ts/lib/ThrowReporter";
-import { Web3EthereumProvider } from "web3-providers";
+import { Provider as Web3EthereumProvider } from "web3/providers";
 import Web3 from "web3";
 
-import { Maybe } from "ethpm/types";
-import * as config from "ethpm/config";
-import * as registries from "ethpm/registries";
-import * as pkg from "ethpm/package";
+import { Maybe } from "../../types";
+import * as config from "../../config";
+import * as registries from "../../registries";
+import * as pkg from "../../package";
 import { Server } from "http";
 import BN from "bn.js";
 import PackagesCursor from "./cursors/packages";

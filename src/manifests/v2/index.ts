@@ -9,11 +9,11 @@ import { ThrowReporter } from "io-ts/lib/ThrowReporter";
 import { URL } from "url";
 import stringify from "json-stable-stringify";
 
-import { lift, lift2 } from "ethpm/types";
+import { lift, lift2 } from "../../types";
 import * as schema from "ethpm-spec";
-import * as config from "ethpm/config";
-import * as pkg from "ethpm/package";
-import * as manifests from "ethpm/manifests/service";
+import * as config from "../../config";
+import * as pkg from "../../package";
+import * as manifests from "../../manifests/service";
 
 const VERSION = "2";
 
@@ -124,13 +124,13 @@ namespace Fields {
     deployment: schema.Deployment,
     types: pkg.ContractTypes
   ): pkg.Deployment {
-    return Object.assign(
-      {}, ...Object.entries(deployment) .map(
-        ([ name, instance ]) => ({
-          [name]: readInstance(instance, types)
-        })
-      )
-    );
+	return Object.assign(
+	  {}, ...Object.entries(deployment) .map(
+		([ name, instance ]) => ({
+		  [name]: readInstance(instance, types)
+		})
+	  )
+	);
   }
 
   export function readInstance (
@@ -171,12 +171,12 @@ namespace Fields {
     deployments: pkg.Deployments,
     types: pkg.ContractTypes,
   ): schema.Deployments {
-    return Object.assign({}, ...
-      Array.from(deployments.entries())
-        .map( ([ chainURI, deployment ]) => ({
-          [chainURI.href]: writeDeployment(deployment, types)
-        }))
-    );
+	return Object.assign({}, ...
+	  Array.from(deployments.entries())
+		.map( ([ chainURI, deployment ]) => ({
+		  [chainURI.href]: writeDeployment(deployment, types)
+		}))
+	);
   }
 
   export function writeContractType (
@@ -388,6 +388,8 @@ export class Writer {
   private package: pkg.Package;
 
   constructor (package_: pkg.Package) {
+	console.log("package_")
+	console.log(package_)
     this.package = package_;
   }
 
@@ -436,8 +438,8 @@ export class Writer {
       {},
       ...Object.entries(sources)
         .map(
-          ([ path, source ]) => (source instanceof URL)
-             ? { [path]: source.href }
+          ([ path, source ]) => (source)
+             ? { [path]: source }
              : { [path]: source }
         )
     );
@@ -448,7 +450,11 @@ export class Writer {
   }
 
   get deployments () {
-    return Fields.writeDeployments(this.package.deployments, this.package.contractTypes);
+	if (this.package.deployments) {
+	  return Fields.writeDeployments(this.package.deployments, this.package.contractTypes);
+	} else {
+	  return {}	
+	}
   }
 
   get build_dependencies () {

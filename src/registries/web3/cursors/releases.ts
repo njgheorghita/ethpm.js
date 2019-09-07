@@ -4,7 +4,7 @@
 
 import Paged from "./paged";
 
-import * as pkg from "ethpm/package";
+import * as pkg from "../../../package";
 import BN from "bn.js";
 import Web3 from "web3";
 

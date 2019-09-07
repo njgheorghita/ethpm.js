@@ -2,8 +2,7 @@
  * @module "ethpm"
  */
 
-require("source-map-support/register");
-require("better-module-alias")(__dirname);
+//require("source-map-support/register");
 
 const { EthPM } = require("./ethpm");
 

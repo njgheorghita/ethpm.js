@@ -2,13 +2,13 @@
  * @module "ethpm/session"
  */
 
-import * as config from "ethpm/config";
-import { Config, HasManifests, HasStorage, HasRegistries } from "ethpm/config";
+import * as config from "../config";
+import { Config, HasManifests, HasStorage, HasRegistries } from "../config";
 
-import * as pkg from "ethpm/package";
-import * as manifests from "ethpm/manifests";
-import * as storage from "ethpm/storage";
-import * as registries from "ethpm/registries";
+import * as pkg from "../package";
+import * as manifests from "../manifests";
+import * as storage from "../storage";
+import * as registries from "../registries";
 
 import { Query } from "./query";
 

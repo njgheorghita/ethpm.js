@@ -2,14 +2,15 @@
  * @module "ethpm/config"
  */
 
-const originalRequire: any = require("original-require");
 
 import * as config from "./config";
 
 export function load<S>(plugin: config.ConfigValue<S>): config.Connector<S> {
   const required =
-    (typeof plugin == "string")
-      ? originalRequire.main.require(plugin) :
+    (typeof plugin == "string" && plugin.includes('manifests'))
+	  ? require('../manifests/v2') :
+    (typeof plugin == "string" && plugin.includes('storage'))
+	  ? require('../storage/ipfs') :
     (typeof plugin == "function")
       ? plugin :
     (typeof plugin == "object" && plugin.default)

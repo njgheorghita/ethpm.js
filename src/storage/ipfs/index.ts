@@ -4,12 +4,11 @@
 
 const IPFS = require("ipfs-http-client");
 
-import { URL } from "url";
 import * as t from "io-ts";
 
-import { Maybe } from "ethpm/types";
-import * as config from "ethpm/config";
-import * as storage from "ethpm/storage";
+import { Maybe } from "../../types";
+import * as config from "../../config";
+import * as storage from "../../storage";
 
 import hash from "./hash";
 
@@ -38,9 +37,11 @@ export class IpfsService implements storage.Service {
   }
 
   async write(content: string): Promise<URL> {
+	console.log("IPFS PRINT")
+	console.log(content)
     const buffer = this.ipfs.types.Buffer.from(content);
     const [{ hash }] = await this.ipfs.add(buffer);
-
+	console.log(hash)
     return new URL(`ipfs://${hash}`);
   }
 

@@ -2,8 +2,8 @@
  * @module "ethpm"
  */
 
-import * as config from "ethpm/config";
-import * as session from "ethpm/session";
+import * as config from "./config";
+import * as session from "./session";
 
 /**
  * This module provides the external interface for configuring an EthPM

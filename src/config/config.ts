@@ -2,8 +2,8 @@
  * @module "ethpm/config"
  */
 
-import * as t from "io-ts";
-import { ThrowReporter } from "io-ts/lib/ThrowReporter";
+import * as t from "../../node_modules/io-ts/lib";
+import { ThrowReporter } from "../../node_modules/io-ts/lib/ThrowReporter";
 
 export type ConfigValue<S = any> =
   string | (() => Connector<S>) | ({ default: () => Connector<S> });
@@ -13,9 +13,9 @@ export type HasStorage = { storage: any };
 export type HasRegistries = { registries: any };
 export type Complete = HasManifests & HasStorage & HasRegistries;
 
-import * as manifests from "ethpm/manifests/service";
-import * as storage from "ethpm/storage/service";
-import * as registries from "ethpm/registries/service";
+import * as manifests from "../manifests/service";
+import * as storage from "../storage/service";
+import * as registries from "../registries/service";
 
 /**
  * Polymorphic type alias for any object that exposes keys for any or all
