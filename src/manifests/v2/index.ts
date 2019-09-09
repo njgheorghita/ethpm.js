@@ -6,7 +6,7 @@ const deepEqual = require("deep-equal");
 import * as t from "io-ts";
 import { ThrowReporter } from "io-ts/lib/ThrowReporter";
 
-import { URL } from "url";
+//import { URL } from "url";
 import stringify from "json-stable-stringify";
 
 import { lift, lift2 } from "../../types";
@@ -124,13 +124,13 @@ namespace Fields {
     deployment: schema.Deployment,
     types: pkg.ContractTypes
   ): pkg.Deployment {
-	return Object.assign(
-	  {}, ...Object.entries(deployment) .map(
-		([ name, instance ]) => ({
-		  [name]: readInstance(instance, types)
-		})
-	  )
-	);
+    return Object.assign(
+      {}, ...Object.entries(deployment) .map(
+        ([ name, instance ]) => ({
+          [name]: readInstance(instance, types)
+        })
+      )
+    );
   }
 
   export function readInstance (
@@ -171,12 +171,13 @@ namespace Fields {
     deployments: pkg.Deployments,
     types: pkg.ContractTypes,
   ): schema.Deployments {
-	return Object.assign({}, ...
-	  Array.from(deployments.entries())
-		.map( ([ chainURI, deployment ]) => ({
-		  [chainURI.href]: writeDeployment(deployment, types)
-		}))
-	);
+    return Object.assign({}, ...
+      Array.from(deployments.entries())
+        .map( ([ chainURI, deployment ]) => ({
+          [chainURI.href]: writeDeployment(deployment, types)
+		})
+      )
+    );
   }
 
   export function writeContractType (
@@ -212,7 +213,7 @@ namespace Fields {
 
       // possibly include link_references
       (
-        bytecode.linkReferences.length > 0 && (
+        bytecode.linkReferences && bytecode.linkReferences.length > 0 && (
           !parent || !deepEqual(bytecode.linkReferences, parent.linkReferences)
         )
       )
@@ -221,7 +222,7 @@ namespace Fields {
 
       // possibly include link_dependencies
       (
-        bytecode.linkDependencies.length > 0 && (
+        bytecode.linkDependencies && bytecode.linkDependencies.length > 0 && (
           !parent ||
             !deepEqual(bytecode.linkDependencies, parent.linkDependencies)
         )
@@ -388,8 +389,6 @@ export class Writer {
   private package: pkg.Package;
 
   constructor (package_: pkg.Package) {
-	console.log("package_")
-	console.log(package_)
     this.package = package_;
   }
 
@@ -403,32 +402,35 @@ export class Writer {
 
   get meta () {
     const metadata = this.package.meta;
+	if (!this.package.meta) {
+	  return null;
+	} else {
+	  return Object.assign(
+		(metadata.authors && metadata.authors.length > 0)
+		  ? { authors: metadata.authors }
+		  : {},
 
-    return Object.assign(
-      (metadata.authors && metadata.authors.length > 0)
-        ? { authors: metadata.authors }
-        : {},
+		(metadata.license)
+		  ? { license: metadata.license }
+		  : {},
 
-      (metadata.license)
-        ? { license: metadata.license }
-        : {},
+		(metadata.description)
+		  ? { description: metadata.description }
+		  : {},
 
-      (metadata.description)
-        ? { description: metadata.description }
-        : {},
+		(metadata.keywords && metadata.keywords.length > 0)
+		  ? { keywords: metadata.keywords }
+		  : {},
 
-      (metadata.keywords && metadata.keywords.length > 0)
-        ? { keywords: metadata.keywords }
-        : {},
-
-      (metadata.links && metadata.links.length > 0)
-        ? {
-            links: Object.assign({}, ...metadata.links.map(
-              ({ resource, uri }) => ({ [resource]: uri })
-            ))
-          }
-        : {}
-    );
+		(metadata.links && metadata.links.length > 0)
+		  ? {
+			  links: Object.assign({}, ...metadata.links.map(
+				({ resource, uri }) => ({ [resource]: uri })
+			  ))
+			}
+		  : {}
+	  );
+	}
   }
 
   get sources () {
@@ -458,15 +460,19 @@ export class Writer {
   }
 
   get build_dependencies () {
-    return Object.assign(
-      {},
-      ...Object.entries(this.package.buildDependencies)
-        .map(
-          ([ name, contentURI ]) => ({
-            [name]: contentURI.href
-          })
-        )
-    );
+	if (!this.package.buildDependencies) {
+	  return null
+	} else {
+	  return Object.assign(
+		{},
+		...Object.entries(this.package.buildDependencies)
+		  .map(
+			([ name, contentURI ]) => ({
+			  [name]: contentURI.href
+			})
+		  )
+	  );
+	}
   }
 
   write (): schema.PackageManifest {
@@ -484,7 +490,7 @@ export class Writer {
         "build_dependencies": this.build_dependencies,
         "meta": this.meta
       }).map(
-        ([field, obj]) => (Object.keys(obj).length > 0)
+        ([field, obj]) => (obj && Object.keys(obj).length > 0)
           ? { [field]: obj }
           : {}
       )

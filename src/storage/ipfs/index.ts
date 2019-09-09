@@ -37,8 +37,6 @@ export class IpfsService implements storage.Service {
   }
 
   async write(content: string): Promise<URL> {
-	console.log("IPFS PRINT")
-	console.log(content)
     const buffer = this.ipfs.types.Buffer.from(content);
     const [{ hash }] = await this.ipfs.add(buffer);
 	console.log(hash)
@@ -46,7 +44,10 @@ export class IpfsService implements storage.Service {
   }
 
   async read(uri: URL): Promise<Maybe<string>> {
-    const hash = uri.host;
+	console.log('ethpm.js')
+	console.log(uri)
+    const hash = uri.toString().substring(7)
+	console.log(hash)
 
     const buffer = await this.ipfs.cat(hash);
 
