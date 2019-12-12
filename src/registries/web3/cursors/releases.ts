@@ -14,14 +14,16 @@ export default class ReleasesCursor extends Paged<BN> implements IterableIterato
   private pointer: BN;
   private length: BN;
   private web3: Web3;
+  private packageName: string;
   private from: string;
   private to: string;
 
-  constructor(pageSize: BN, length: BN, web3: Web3, from: string, to: string) {
+  constructor(pageSize: BN, length: BN, web3: Web3, packageName: string, from: string, to: string) {
     super(pageSize);
     this.pointer = new BN(0);
     this.length = length.clone();
     this.web3 = web3;
+    this.packageName = packageName;
     this.from = from;
     this.to = to;
   }
@@ -84,9 +86,9 @@ export default class ReleasesCursor extends Paged<BN> implements IterableIterato
             name: "offset"
           }, {
             type: "uint",
-            limit: "limit"
+            name: "limit"
           }]
-        }, ["0x" + offset.toString("hex"), "0x" + limit.toString("hex")]);
+        }, [this.packageName, "0x" + offset.toString("hex"), "0x" + limit.toString("hex")]);
 
         const promise: ResultType = new Promise((resolve, reject) => {
           return this.web3.eth.call({
