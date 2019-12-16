@@ -7,27 +7,33 @@ import Paged from "./paged";
 import * as pkg from "ethpm/package";
 import BN from "bn.js";
 import Web3 from "web3";
+import Contract from "web3/eth/contract";
 
-//# this type is wrong
-type ResultType = Promise<pkg.Version>;
+interface ReleaseData {
+  packageName: pkg.PackageName;
+  version: pkg.Version;
+  manifestURI: pkg.ContentURI;
+}
+
+type ResultType = Promise<ReleaseData>;
 
 export default class ReleasesCursor extends Paged<BN> implements IterableIterator<ResultType> {
   private pointer: BN;
   private length: BN;
   private web3: Web3;
   private packageName: string;
-  private registry: any;
+  private registry: Contract;
   private releaseIds: any
 
-  constructor(pageSize: BN, length: BN, web3: Web3, registry: any, packageName: string, releaseIds: any) {
+  constructor(pageSize: BN, length: BN, web3: Web3, registry: Contract, packageName: string, releaseIds: any) {
     super(pageSize);
     this.pointer = new BN(0);
     this.length = length.clone();
     this.web3 = web3;
     this.packageName = packageName;
-	this.registry = registry;
-	this.releaseIds = releaseIds;
-	this.setPages(this.releaseIds)
+    this.registry = registry;
+    this.releaseIds = releaseIds;
+    this.setPages(this.releaseIds)
   }
 
   private getReleaseData(): IteratorResult<ResultType> {
@@ -37,9 +43,9 @@ export default class ReleasesCursor extends Paged<BN> implements IterableIterato
         resolve("");
       }
       else {
-		this.registry.methods.getReleaseData(releaseId).call().then((result) => {
-		  return resolve(result);
-		});
+        this.registry.methods.getReleaseData(releaseId).call().then((result) => {
+          return resolve(result);
+        });
       }
     });
     this.pointer = this.pointer.addn(1);

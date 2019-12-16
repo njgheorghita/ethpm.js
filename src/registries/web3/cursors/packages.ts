@@ -7,6 +7,7 @@ import Paged from "./paged";
 import * as pkg from "ethpm/package";
 import BN from "bn.js";
 import Web3 from "web3";
+import Contract from "web3/eth/contract";
 
 type ResultType = Promise<pkg.PackageName>;
 
@@ -14,17 +15,17 @@ export default class PackagesCursor extends Paged<BN> implements IterableIterato
   private pointer: BN;
   private length: BN;
   private web3: Web3;
-  private registry: any;
+  private registry: Contract;
   private packageIds: any;
 
-  constructor(pageSize: BN, length: BN, web3: Web3, registry: any, packageIds: any) {
+  constructor(pageSize: BN, length: BN, web3: Web3, registry: Contract, packageIds: any) {
     super(pageSize);
     this.pointer = new BN(0);
     this.length = length.clone();
     this.web3 = web3;
     this.registry = registry;
-	this.packageIds = packageIds;
-	this.setPages(packageIds)
+    this.packageIds = packageIds;
+    this.setPages(packageIds)
   }
 
   private getName(): IteratorResult<ResultType> {
@@ -34,12 +35,12 @@ export default class PackagesCursor extends Paged<BN> implements IterableIterato
         resolve("");
       }
       else {
-		this.registry.methods.getPackageName(packageId).call().then((result) => {
-		  return resolve(result);
+        this.registry.methods.getPackageName(packageId).call().then((result) => {
+          return resolve(result);
         });
       }
     });
-	this.pointer = this.pointer.addn(1);
+    this.pointer = this.pointer.addn(1);
     return {
       done: false,
       value: promise
@@ -48,7 +49,7 @@ export default class PackagesCursor extends Paged<BN> implements IterableIterato
 
   public next(): IteratorResult<ResultType> {
     if (this.pointer.lt(this.length)) {
-	  return this.getName()
+      return this.getName()
     } else {
       return {
         done: true,
