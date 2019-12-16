@@ -2,7 +2,7 @@
  * @module "ethpm/registries/web3"
  */
 
-import BN from "bn.js";
+import BN from 'bn.js';
 
 interface PagedIds {
     [k: number]: Array<string>
@@ -10,6 +10,7 @@ interface PagedIds {
 
 export default class Paged<T> {
   protected pageSize: BN;
+
   public pages: PagedIds
 
   constructor(pageSize: BN) {
@@ -22,25 +23,24 @@ export default class Paged<T> {
   }
 
   setPage(page: BN, value: T[]) {
-    this.pages[page.toString("hex")] = value;
+    this.pages[page.toString('hex')] = value;
   }
 
   setPages(pageIds: PagedIds) {
-    this.pages = pageIds
+    this.pages = pageIds;
   }
 
   hasPage(pointer: BN): boolean {
-    return typeof this.pages[this.pointerToPage(pointer).toString("hex")] !== "undefined";
+    return typeof this.pages[this.pointerToPage(pointer).toString('hex')] !== 'undefined';
   }
 
   getDatum(pointer: BN): T | null {
     if (this.hasPage(pointer)) {
-      const page = this.pages[this.pointerToPage(pointer).toString("hex")];
+      const page = this.pages[this.pointerToPage(pointer).toString('hex')];
       const index = pointer.mod(this.pageSize).toNumber();
       return page[index];
     }
-    else {
-      return null;
-    }
+
+    return null;
   }
 }

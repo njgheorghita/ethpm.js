@@ -2,31 +2,34 @@
  * @module "ethpm/registries/web3"
  */
 
-import { URL } from "url";
-import * as t from "io-ts";
-import { ThrowReporter } from "io-ts/lib/ThrowReporter";
-import { Provider as Web3Provider } from "web3/providers";
-import Web3 from "web3";
-import Contract from "web3/eth/contract";
+import { URL } from 'url';
+import * as t from 'io-ts';
+import { ThrowReporter } from 'io-ts/lib/ThrowReporter';
+import { Provider as Web3Provider } from 'web3/providers';
+import Web3 from 'web3';
+import Contract from 'web3/eth/contract';
 
-import { Maybe } from "ethpm/types";
-import * as config from "ethpm/config";
-import * as registries from "ethpm/registries";
-import * as pkg from "ethpm/package";
-import { Server } from "http";
-import BN from "bn.js";
-import PackagesCursor from "./cursors/packages";
-import ReleasesCursor from "./cursors/releases";
+import { Maybe } from 'ethpm/types';
+import * as config from 'ethpm/config';
+import * as registries from 'ethpm/registries';
+import * as pkg from 'ethpm/package';
+import { Server } from 'http';
+import BN from 'bn.js';
+import PackagesCursor from './cursors/packages';
+import ReleasesCursor from './cursors/releases';
 
 const registryManifest = require('./simple/registry.json');
+
 const PAGE_SIZE = 10;
 
 export class Web3RegistryService implements registries.Service {
   private web3: Web3;
+
   private address: string;
+
   private registry: Contract;
 
-  constructor (provider: Web3Provider, address: string) {
+  constructor(provider: Web3Provider, address: string) {
     this.web3 = new Web3(provider);
     this.address = address;
     const registryABI = registryManifest.contract_types.PackageRegistry.abi;
@@ -34,20 +37,20 @@ export class Web3RegistryService implements registries.Service {
   }
 
   // needs testing
-  async publish (
+  async publish(
     packageName: pkg.PackageName,
     version: pkg.Version,
-    manifest: URL
+    manifest: URL,
   ): Promise<any> {
-    await this.registry.methods.release(packageName, version, manifest).transact({})
+    await this.registry.methods.release(packageName, version, manifest).transact({});
     // estimate gas requirement, and pad it a bit because some clients don't
     // handle gas refunds and such well
-    //let gas = await this.web3.eth.estimateGas(txParams)
-    //gas *= 1.2
-    //await this.web3.eth.sendTransaction({
-      //gas,
-      //...txParams
-    //})
+    // let gas = await this.web3.eth.estimateGas(txParams)
+    // gas *= 1.2
+    // await this.web3.eth.sendTransaction({
+    // gas,
+    // ...txParams
+    // })
   }
 
   async numPackageIds(): Promise<BN> {
@@ -56,15 +59,15 @@ export class Web3RegistryService implements registries.Service {
   }
 
   async getReleaseData(packageName: pkg.PackageName, version: pkg.Version): Promise<pkg.ContentURI> {
-    let releaseId = await this.registry.methods.getReleaseId(packageName, version).call();
-    let releaseData = await this.registry.methods.getReleaseData(releaseId).call();
+    const releaseId = await this.registry.methods.getReleaseId(packageName, version).call();
+    const releaseData = await this.registry.methods.getReleaseData(releaseId).call();
     const ipfsHash = releaseData[2];
     return ipfsHash;
-  };
+  }
 
-  async packages (): Promise<PackagesCursor> {
-    const numPackages = await this.numPackageIds()
-    let allPackageIds = await this.getAllPackageIds(numPackages)
+  async packages(): Promise<PackagesCursor> {
+    const numPackages = await this.numPackageIds();
+    const allPackageIds = await this.getAllPackageIds(numPackages);
     const cursor = new PackagesCursor(
       new BN(PAGE_SIZE),
       numPackages,
@@ -73,47 +76,47 @@ export class Web3RegistryService implements registries.Service {
       allPackageIds,
     );
     const unsortedPackages = await Promise.all(Array.from(cursor));
-    return unsortedPackages.sort()
+    return unsortedPackages.sort();
   }
 
   async getAllPackageIds(numPackages: BN) {
-    let pageToIds = {}
-    let packageCount = 0
-    const numPages = (numPackages.toNumber() - 1) / PAGE_SIZE
+    const pageToIds = {};
+    let packageCount = 0;
+    const numPages = (numPackages.toNumber() - 1) / PAGE_SIZE;
     for (let i = 0; i < numPages; i++) {
-      const slice = await this.registry.methods.getAllPackageIds(packageCount, PAGE_SIZE).call()
-      pageToIds[i] = slice
-      packageCount += PAGE_SIZE
+      const slice = await this.registry.methods.getAllPackageIds(packageCount, PAGE_SIZE).call();
+      pageToIds[i] = slice;
+      packageCount += PAGE_SIZE;
     }
-    const formattedPageToIds = Object.keys(pageToIds).reduce(function(result, key) {
-      result[key] = pageToIds[key]['packageIds'];
-      return result
-    }, {})
-    return formattedPageToIds
+    const formattedPageToIds = Object.keys(pageToIds).reduce((result, key) => {
+      result[key] = pageToIds[key].packageIds;
+      return result;
+    }, {});
+    return formattedPageToIds;
   }
 
   async getAllReleaseIds(packageName: pkg.PackageName, numReleases: BN) {
-    let pageToIds = {}
-    let releaseCount = 0
-    const numPages = (numReleases.toNumber() - 1) / PAGE_SIZE
+    const pageToIds = {};
+    let releaseCount = 0;
+    const numPages = (numReleases.toNumber() - 1) / PAGE_SIZE;
     for (let i = 0; i < numPages; i++) {
-      const slice = await this.registry.methods.getAllReleaseIds(packageName, releaseCount, PAGE_SIZE).call({})
-      pageToIds[i] = slice
-      releaseCount += PAGE_SIZE
+      const slice = await this.registry.methods.getAllReleaseIds(packageName, releaseCount, PAGE_SIZE).call({});
+      pageToIds[i] = slice;
+      releaseCount += PAGE_SIZE;
     }
-    const formattedPageToIds = Object.keys(pageToIds).reduce(function(result, key) {
-      result[key] = pageToIds[key]['releaseIds'];
-      return result
-    }, {})
-    return formattedPageToIds
+    const formattedPageToIds = Object.keys(pageToIds).reduce((result, key) => {
+      result[key] = pageToIds[key].releaseIds;
+      return result;
+    }, {});
+    return formattedPageToIds;
   }
 
-  package (packageName: pkg.PackageName) {
+  package(packageName: pkg.PackageName) {
     return {
       releases: async (): Promise<ReleasesCursor> => {
-        const count = await this.registry.methods.numReleaseIds(packageName).call()
+        const count = await this.registry.methods.numReleaseIds(packageName).call();
         const numReleases = new BN(count);
-        const allReleaseIds= await this.getAllReleaseIds(packageName, numReleases)
+        const allReleaseIds = await this.getAllReleaseIds(packageName, numReleases);
         const cursor = new ReleasesCursor(
           new BN(PAGE_SIZE),
           numReleases,
@@ -123,19 +126,19 @@ export class Web3RegistryService implements registries.Service {
           allReleaseIds,
         );
         const allReleaseData = await Promise.all(Array.from(cursor));
-        const formattedReleases = allReleaseData.reduce(function(map, obj) {
+        const formattedReleases = allReleaseData.reduce((map, obj) => {
           map[obj.version] = obj.manifestURI;
           return map;
         }, {});
-        return formattedReleases
+        return formattedReleases;
       },
 
       release: async (version: pkg.Version): Promise<URL> => {
-        let releaseId = await this.registry.methods.getReleaseId(packageName, version).call()
-        const releaseData = await this.registry.methods.getReleaseData(releaseId).call()
+        const releaseId = await this.registry.methods.getReleaseId(packageName, version).call();
+        const releaseData = await this.registry.methods.getReleaseData(releaseId).call();
         return new URL(releaseData[2]);
-      }
-    }
+      },
+    };
   }
 }
 
@@ -145,15 +148,14 @@ type Web3RegistryOptions = {
 };
 
 export default class Web3RegistryConnector
-  extends config.Connector<registries.Service>
-{
+  extends config.Connector<registries.Service> {
   optionsType = t.interface({
     provider: t.object,
-    registryAddress: t.string
+    registryAddress: t.string,
   });
 
   async init(
-    { provider, registryAddress }: Web3RegistryOptions
+    { provider, registryAddress }: Web3RegistryOptions,
   ): Promise<registries.Service> {
     const service = new Web3RegistryService(provider, registryAddress);
     return service;

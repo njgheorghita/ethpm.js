@@ -2,12 +2,12 @@
  * @module "ethpm/registries/web3"
  */
 
-import Paged from "./paged";
 
-import * as pkg from "ethpm/package";
-import BN from "bn.js";
-import Web3 from "web3";
-import Contract from "web3/eth/contract";
+import * as pkg from 'ethpm/package';
+import BN from 'bn.js';
+import Web3 from 'web3';
+import Contract from 'web3/eth/contract';
+import Paged from './paged';
 
 interface ReleaseData {
   packageName: pkg.PackageName;
@@ -19,10 +19,15 @@ type ResultType = Promise<ReleaseData>;
 
 export default class ReleasesCursor extends Paged<BN> implements IterableIterator<ResultType> {
   private pointer: BN;
+
   private length: BN;
+
   private web3: Web3;
+
   private packageName: string;
+
   private registry: Contract;
+
   private releaseIds: any
 
   constructor(pageSize: BN, length: BN, web3: Web3, registry: Contract, packageName: string, releaseIds: any) {
@@ -33,37 +38,33 @@ export default class ReleasesCursor extends Paged<BN> implements IterableIterato
     this.packageName = packageName;
     this.registry = registry;
     this.releaseIds = releaseIds;
-    this.setPages(this.releaseIds)
+    this.setPages(this.releaseIds);
   }
 
   private getReleaseData(): IteratorResult<ResultType> {
     const promise: ResultType = new Promise((resolve, reject) => {
       const releaseId = this.getDatum(this.pointer);
       if (releaseId === null) {
-        resolve("");
-      }
-      else {
-        this.registry.methods.getReleaseData(releaseId).call().then((result) => {
-          return resolve(result);
-        });
+        resolve('');
+      } else {
+        this.registry.methods.getReleaseData(releaseId).call().then((result) => resolve(result));
       }
     });
     this.pointer = this.pointer.addn(1);
     return {
       done: false,
-      value: promise
+      value: promise,
     };
   }
 
   public next(): IteratorResult<ResultType> {
     if (this.pointer.lt(this.length)) {
       return this.getReleaseData();
-    } else {
-      return {
-        done: true,
-        value: undefined
-      }
     }
+    return {
+      done: true,
+      value: undefined,
+    };
   }
 
   [Symbol.iterator](): IterableIterator<ResultType> {
